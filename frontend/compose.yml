@@ -1,13 +1,11 @@
 services:
-  acm-react:
-    build: .
-    restart: always
-    command: npm run dev
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
-    stdin_open: true
+  react-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - 8080:8080
+    volumes:
+      - ./dist:/app/react-app/dist
+    environment:
+      - NODE_ENV=production

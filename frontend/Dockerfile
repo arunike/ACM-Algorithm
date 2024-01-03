@@ -1,9 +1,17 @@
-FROM node:alpine
-RUN mkdir /app
-COPY ./src /app/src
-COPY ./public /app/public
-COPY ./package.json /app/package.json
-COPY ./package-lock.json /app/package-lock.json
-WORKDIR /app
+FROM node:alpine as BUILD_IMAGE
+WORKDIR /app/react-app
+COPY package.json .
 RUN npm install
+COPY . .
 RUN npm run build
+
+FROM node:alpine as PRODUCTION_IMAGE
+WORKDIR /app/react-app
+COPY --from=BUILD_IMAGE /app/react-app/dist/ /app/react-app/dist/
+EXPOSE 8080
+
+COPY package.json .
+COPY vite.config.js .
+RUN npm install javascript
+EXPOSE 8080
+CMD ["npm", "run", "preview"]
