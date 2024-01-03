@@ -1,16 +1,7 @@
-FROM node:alpine as BUILD_IMAGE
-WORKDIR /app/react-app
-COPY package.json .
-RUN npm install
-COPY . .
-RUN npm run build
+# Be sure to run 'npm run build' first!
+FROM nginx:stable-alpine
+COPY dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-FROM node:alpine as PRODUCTION_IMAGE
-WORKDIR /app/react-app
-COPY --from=BUILD_IMAGE /app/react-app/dist/ /app/react-app/dist/
-EXPOSE 8080
-
-COPY package.json .
-COPY vite.config.js .
-RUN npm install
-EXPOSE 8080
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

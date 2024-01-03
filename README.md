@@ -18,7 +18,7 @@ cd frontend
 ``````
 
 ``````
-docker compose up
+sh start_react.sh
 ``````
 
 ## Installation Development
