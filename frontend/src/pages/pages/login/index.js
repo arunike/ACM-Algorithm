@@ -80,6 +80,15 @@ const LoginPage = () => {
     event.preventDefault()
   }
 
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  const handleDropdownClose = url => {
+    if (url) {
+      router.push(url)
+    }
+    setAnchorEl(null)
+  }
+
   return (
     <Box className='content-center'>
       <Card sx={{ zIndex: 1 }}>
@@ -227,7 +236,7 @@ const LoginPage = () => {
                 </IconButton>
               </Link>
               <Link href='/' passHref>
-                <IconButton component='a' onClick={e => e.preventDefault()}>
+                <IconButton component='a' onClick={() => handleDropdownClose('http://localhost:8000/login/')}>
                   <Github
                     sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
                   />
