@@ -1,5 +1,5 @@
 import { useState, Fragment } from 'react';
-
+import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -28,6 +28,7 @@ import themeConfig from 'src/configs/themeConfig';
 import BlankLayout from 'src/@core/layouts/BlankLayout';
 
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration';
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: { width: '28rem' }
@@ -115,6 +116,16 @@ const RegisterPage = () => {
       console.error('Validation failed');
       return;
     }
+    const user = {
+      username: values.username,
+      email: values.email,
+      password: values.password,
+    };
+    axios.post('http://localhost:8000/auth/login/', user).then(response => {
+      // if username and password in the response body, then it is a success sign up, and we can redirect to login page
+      // if not, then it is a failure sign up
+    })
+
 
     console.log('Form submitted');
     router.push('http://localhost:8000/login/');
