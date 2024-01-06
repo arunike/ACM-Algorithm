@@ -1,0 +1,9 @@
+django~=5.0.1
+mysqlclient
+djangorestframework~=3.14.0
+django-filter
+django-cors-headers
+djangorestframework-simplejwt
+django-allauth
+social-auth-app-django
+requests
