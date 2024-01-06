@@ -52,9 +52,11 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 
 const RegisterPage = () => {
   const [values, setValues] = useState({
+    username: '',
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     showPassword: false,
     errors: {},
     isFormValid: false,
@@ -64,27 +66,35 @@ const RegisterPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateUsername = (username) => username.length >= 4;
   const validateName = (name) => name.length >= 4;
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePassword = (password) => password.length >= 8;
+  const validateConfirmPassword = (password, confirmPassword) => password === confirmPassword;
 
   const updateFormValidity = () => {
+    const isUsernameValid = validateUsername(values.username);
     const isNameValid = validateName(values.name);
     const isEmailValid = validateEmail(values.email);
     const isPasswordValid = validatePassword(values.password);
-    setValues(values => ({ ...values, isFormValid: isNameValid && isEmailValid && isPasswordValid }));
+    const isConfirmPasswordValid = validateConfirmPassword(values.password, values.confirmPassword);
+    setValues(values => ({ ...values, isFormValid: isUsernameValid && isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid }));
   };
 
   const handleChange = (prop) => (event) => {
     const { value } = event.target;
     let error = '';
 
-    if (prop === 'email' && !validateEmail(value)) {
-      error = 'Invalid email format';
+    if (prop === 'username' && !validateUsername(value)) {
+      error = 'Username must be at least 4 characters';
     } else if (prop === 'name' && !validateName(value)) {
       error = 'Name must be at least 4 characters';
+    } else if (prop === 'email' && !validateEmail(value)) {
+      error = 'Invalid email format';
     } else if (prop === 'password' && !validatePassword(value)) {
       error = 'Password must be at least 8 characters';
+    } else if (prop === 'confirmPassword' && !validateConfirmPassword(values.password, value)) {
+      error = 'Passwords do not match';
     }
 
     setValues({ ...values, [prop]: value, errors: { ...values.errors, [prop]: error } });
@@ -113,12 +123,13 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = () => {
-    if (!validateEmail(values.email) || !validateName(values.name) || !validatePassword(values.password)) {
+    if (!values.isFormValid) {
       console.error('Validation failed');
       return;
     };
 
     const user = {
+      username: values.username,
       name: values.name,
       email: values.email,
       password: values.password,
@@ -126,15 +137,14 @@ const RegisterPage = () => {
 
     axios.post('http://localhost:8000/auth/signup/', user)
     .then(resp => {
-      console.log("Registration successful", resp.data);
-
+      // console.log("Registration successful", resp.data);
       router.push('http://localhost:3000/login/');
       toast.success("Registration successful");
     }).catch(err => {
       toast.error(err.response.data.message);
     });
 
-    console.log("Form Submitted");
+    // console.log("Form Submitted");
   };
 
   return (
@@ -226,6 +236,18 @@ const RegisterPage = () => {
 
           <form noValidate autoComplete='off' onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             <TextField
+                autoFocus
+                fullWidth
+                id='username'
+                label='Username'
+                value={values.username}
+                onChange={handleChange('username')}
+                error={!!values.errors.username}
+                helperText={values.errors.username}
+                sx={{ marginBottom: 4 }}
+              />
+
+            <TextField
               autoFocus
               fullWidth
               id='name'
@@ -233,7 +255,7 @@ const RegisterPage = () => {
               value={values.name}
               onChange={handleChange('name')}
               error={!!values.errors.name}
-              helpertext={values.errors.name}
+              helperText={values.errors.name}
               sx={{ marginBottom: 4 }}
             />
 
@@ -244,7 +266,7 @@ const RegisterPage = () => {
               value={values.email}
               onChange={handleChange('email')}
               error={!!values.errors.email}
-              helpertext={values.errors.email}
+              helperText={values.errors.email}
               sx={{ marginBottom: 4 }}
             />
 
@@ -256,6 +278,8 @@ const RegisterPage = () => {
                 id='auth-register-password'
                 onChange={handleChange('password')}
                 type={values.showPassword ? 'text' : 'password'}
+                error={!!values.errors.password}
+                sx={{ marginBottom: 4 }}
                 endAdornment={
                   <InputAdornment position='end'>
                     <IconButton
@@ -269,6 +293,32 @@ const RegisterPage = () => {
                   </InputAdornment>
                 }
               />
+              {values.errors.password && <Typography color="error">{values.errors.password}</Typography>}
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel htmlFor='auth-register-confirm-password'>Confirm Password</InputLabel>
+              <OutlinedInput
+                label='Confirm Password'
+                value={values.confirmPassword}
+                id='auth-register-confirm-password'
+                onChange={handleChange('confirmPassword')}
+                type={values.showPassword ? 'text' : 'password'}
+                error={!!values.errors.confirmPassword}
+                endAdornment={
+                  <InputAdornment position='end'>
+                    <IconButton
+                      edge='end'
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      aria-label='toggle password visibility'
+                    >
+                      {values.showPassword ? <EyeOutline fontSize='small' /> : <EyeOffOutline fontSize='small' />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+              {values.errors.confirmPassword && <Typography color="error">{values.errors.confirmPassword}</Typography>}
             </FormControl>
 
             <FormControlLabel
@@ -307,7 +357,7 @@ const RegisterPage = () => {
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
-                <IconButton component='a' onClick={() => handleDropdownClose('http://localhost:8000/login/')}>
+                <IconButton component='a' onClick={() => handleDropdownClose('http://127.0.0.1:8000/login/github/login/github/')}>
                   <Github
                     sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
                   />
