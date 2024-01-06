@@ -1,7 +1,9 @@
 import { useState } from 'react';
-
+import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -48,15 +50,29 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 
 const LoginPage = () => {
   const [values, setValues] = useState({
+    email: '',
     password: '',
-    showPassword: false
+    showPassword: false,
+    errors: {}
   });
 
   const theme = useTheme();
   const router = useRouter();
 
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password) => password.length >= 8;
+
   const handleChange = prop => event => {
-    setValues({ ...values, [prop]: event.target.value })
+    const { value } = event.target;
+    let error = '';
+
+    if (prop === 'email' && !validateEmail(value)) {
+      error = 'Invalid email format';
+    } else if (prop === 'password' && !validatePassword(value)) {
+      error = 'Password must be at least 8 characters';
+    }
+
+    setValues({ ...values, [prop]: value, errors: { ...values.errors, [prop]: error } });
   };
 
   const handleClickShowPassword = () => {
@@ -76,8 +92,36 @@ const LoginPage = () => {
     setAnchorEl(null)
   };
 
+  const handleSubmit = () => {
+    if (!validateEmail(values.email) || !validatePassword(values.password)) {
+      console.error('Validation failed');
+      return;
+    };
+
+    const user = {
+      email: values.email,
+      password: values.password
+    };
+
+    console.log("Logging in", user);
+
+    axios.post('http://localhost:8000/auth/login/', user)
+    .then(resp => {
+      console.log("Login successful", resp.data);
+
+      router.push('http://localhost:3000/');
+
+      toast.success("Login successful");
+    }).catch(err => {
+      console.log("Login failed", err.response.data.message);
+
+      toast.error(err.response.data.message);
+    });
+  };
+
   return (
     <Box className='content-center'>
+      <ToastContainer />
       <Card sx={{ zIndex: 1 }}>
         <CardContent sx={{ padding: theme => `${theme.spacing(12, 9, 7)} !important` }}>
           <Box sx={{ mb: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -162,8 +206,18 @@ const LoginPage = () => {
             <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
           </Box>
 
-          <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-            <TextField autoFocus fullWidth id='email' label='Email' sx={{ marginBottom: 4 }} />
+          <form noValidate autoComplete='off' onSubmit={(e) => { e.preventDefault() }}>
+            <TextField
+              autoFocus
+              fullWidth
+              id='email'
+              label='Email'
+              value={values.email}
+              onChange={handleChange('email')}
+              error={!!values.errors.email}
+              helpertext={values.errors.email}
+              sx={{ marginBottom: 4 }}
+            />
 
             <FormControl fullWidth>
               <InputLabel htmlFor='auth-login-password'>Password</InputLabel>
@@ -185,6 +239,8 @@ const LoginPage = () => {
                     </IconButton>
                   </InputAdornment>
                 }
+                error={!!values.errors.password}
+                helpertext={values.errors.password}
               />
             </FormControl>
 
@@ -200,7 +256,7 @@ const LoginPage = () => {
               size='large'
               variant='contained'
               sx={{ marginBottom: 7 }}
-              onClick={() => router.push('/')}
+              onClick={handleSubmit}
             >
               Login
             </Button>

@@ -233,7 +233,7 @@ const RegisterPage = () => {
               value={values.name}
               onChange={handleChange('name')}
               error={!!values.errors.name}
-              helperText={values.errors.name}
+              helpertext={values.errors.name}
               sx={{ marginBottom: 4 }}
             />
 
@@ -244,7 +244,7 @@ const RegisterPage = () => {
               value={values.email}
               onChange={handleChange('email')}
               error={!!values.errors.email}
-              helperText={values.errors.email}
+              helpertext={values.errors.email}
               sx={{ marginBottom: 4 }}
             />
 
