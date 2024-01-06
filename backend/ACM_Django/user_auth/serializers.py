@@ -16,12 +16,12 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ['name', 'email', 'password']
 
-    def validate(self, attrs):
-        """ Validate the user input """
-        email_exists = User.objects.filter(email=attrs['email']).exists()
-        if email_exists:
-            raise serializers.ValidationError("Email already exists")
-        return super().validate(attrs)
+    # def validate(self, attrs):
+    #     """ Validate the user input """
+    #     email_exists = User.objects.filter(email=attrs['email']).exists()
+    #     if email_exists:
+    #         raise serializers.ValidationError("Email already exists")
+    #     return super().validate(attrs)
 
 
 class LoginSerializer(serializers.ModelSerializer):

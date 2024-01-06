@@ -23,6 +23,7 @@ class SignUpView(generics.GenericAPIView):
                 }
                 return Response(data=response, status=status.HTTP_201_CREATED)
             else:
+                print("Email already exists")
                 response = {
                     "message": "Email already exists"
                 }

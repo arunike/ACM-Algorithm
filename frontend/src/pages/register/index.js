@@ -2,6 +2,8 @@ import { useState, Fragment } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -29,7 +31,6 @@ import BlankLayout from 'src/@core/layouts/BlankLayout';
 
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration';
 
-
 const Card = styled(MuiCard)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: { width: '28rem' }
 }));
@@ -51,7 +52,7 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 
 const RegisterPage = () => {
   const [values, setValues] = useState({
-    username: '',
+    name: '',
     email: '',
     password: '',
     showPassword: false,
@@ -64,14 +65,14 @@ const RegisterPage = () => {
   const router = useRouter();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validateUsername = (username) => username.length >= 4;
+  const validateName = (name) => name.length >= 4;
   const validatePassword = (password) => password.length >= 8;
 
   const updateFormValidity = () => {
-    const isUsernameValid = validateUsername(values.username);
+    const isNameValid = validateName(values.name);
     const isEmailValid = validateEmail(values.email);
     const isPasswordValid = validatePassword(values.password);
-    setValues(values => ({ ...values, isFormValid: isUsernameValid && isEmailValid && isPasswordValid }));
+    setValues(values => ({ ...values, isFormValid: isNameValid && isEmailValid && isPasswordValid }));
   };
 
   const handleChange = (prop) => (event) => {
@@ -80,8 +81,8 @@ const RegisterPage = () => {
 
     if (prop === 'email' && !validateEmail(value)) {
       error = 'Invalid email format';
-    } else if (prop === 'username' && !validateUsername(value)) {
-      error = 'Username must be at least 4 characters';
+    } else if (prop === 'name' && !validateName(value)) {
+      error = 'Name must be at least 4 characters';
     } else if (prop === 'password' && !validatePassword(value)) {
       error = 'Password must be at least 8 characters';
     }
@@ -112,27 +113,33 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = () => {
-    if (!validateEmail(values.email) || !validateUsername(values.username) || !validatePassword(values.password)) {
+    if (!validateEmail(values.email) || !validateName(values.name) || !validatePassword(values.password)) {
       console.error('Validation failed');
       return;
-    }
+    };
+
     const user = {
-      username: values.username,
+      name: values.name,
       email: values.email,
       password: values.password,
     };
-    axios.post('http://localhost:8000/auth/login/', user).then(response => {
-      // if username and password in the response body, then it is a success sign up, and we can redirect to login page
-      // if not, then it is a failure sign up
-    })
 
+    axios.post('http://localhost:8000/auth/signup/', user)
+    .then(resp => {
+      console.log("Registration successful", resp.data);
 
-    console.log('Form submitted');
-    router.push('http://localhost:8000/login/');
+      router.push('http://localhost:3000/login/');
+      toast.success("Registration successful");
+    }).catch(err => {
+      toast.error(err.response.data.message);
+    });
+
+    console.log("Form Submitted");
   };
 
   return (
     <Box className='content-center'>
+      <ToastContainer />
       <Card sx={{ zIndex: 1 }}>
         <CardContent sx={{ padding: theme => `${theme.spacing(12, 9, 7)} !important` }}>
           <Box sx={{ mb: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -221,12 +228,12 @@ const RegisterPage = () => {
             <TextField
               autoFocus
               fullWidth
-              id='username'
-              label='Username'
-              value={values.username}
-              onChange={handleChange('username')}
-              error={!!values.errors.username}
-              helperText={values.errors.username}
+              id='name'
+              label='Name'
+              value={values.name}
+              onChange={handleChange('name')}
+              error={!!values.errors.name}
+              helperText={values.errors.name}
               sx={{ marginBottom: 4 }}
             />
 
@@ -282,7 +289,6 @@ const RegisterPage = () => {
               variant='contained'
               disabled={!values.isFormValid || !checked}
               sx={{ marginBottom: 7 }}
-              onClick={() => handleDropdownClose('http://localhost:8000/login/')}
             >
               Sign up
             </Button>
