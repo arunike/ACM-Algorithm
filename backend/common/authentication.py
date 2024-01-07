@@ -1,23 +1,18 @@
-# from django.contrib.auth.backends import ModelBackend
-#
-#
-# class UserBackend(ModelBackend):
-#     """
-#     Custom user authentication
-#     """
-#
-#     def authenticate(self, request, username=None, password=None, **kwargs):
-#         """
-#         Custom user authentication
-#         :param request: request
-#         :param username: username
-#         :param password: password
-#         :param kwargs: kwargs
-#         :return: user
-#         """
-#         try:
-#             user = User.objects.get(username=username)
-#             if user.check_password(password):
-#                 return user
-#         except Exception as e:
-#             return None
+from django.contrib.auth.backends import ModelBackend
+from django.db.models import Q
+from users.models import User
+from rest_framework import serializers
+
+
+class MyBackend(ModelBackend):
+    """ custom authentication backend """
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        try:
+            user = User.objects.get(Q(username=username) | Q(email=username))
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"error": "username or password is wrong"})
+        else:
+            if user.check_password(password):
+                return user
+            else:
+                raise serializers.ValidationError({"error": "username or password is wrong"})

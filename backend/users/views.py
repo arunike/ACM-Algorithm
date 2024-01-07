@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenVerifyView
 from users.models import User
 from social_django.models import UserSocialAuth
+import requests
 
 
 class LoginView(TokenObtainPairView):
@@ -14,7 +17,6 @@ class LoginView(TokenObtainPairView):
 
         try:
             serializer.is_valid(raise_exception=True)
-            print("serializer is valid")
         except TokenError as e:
             raise InvalidToken(e.args[0])
 
@@ -61,26 +63,69 @@ class RegisterView(APIView):
             "name": name,
             "email": email
         }
+
         return Response(data=res, status=status.HTTP_201_CREATED)
 
 
 class GitHubLoginView(APIView):
     """ GitHub login redirect view"""
+
     def get(self, request):
         """ get request """
-        print(request.user.is_authenticated)
-        print(request.user.id)
         if request.user.is_authenticated:
             github_social_auth = UserSocialAuth.objects.get(user=request.user, provider='github')
             access_token = github_social_auth.extra_data['access_token']
-            """ get access token """
-            print(access_token)
-            return Response(data={"access_token": access_token}, status=status.HTTP_200_OK)
-        else:
-            return Response(data={"error": "user not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+            headers = {
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {access_token}",
+                "X-GitHub-Api-Version": "2022-11-28"
+            }
+            response = requests.get(f'https://api.github.com/user/emails', headers=headers)
+            user_email = response.json()[0]['email']
+            response = requests.get(f'https://api.github.com/user', headers=headers)
+            name, username = response.json()['login'], response.json()['id']
+            user = User.objects.filter(email=user_email).first()
+            if user is None:
+                random_password = User.objects.make_random_password()
+                user = User.objects.create_user(username=username, password=random_password, name=name, email=user_email)
+                user.save()
+            user = User.objects.get(email=user_email)
+            token = RefreshToken.for_user(user)
+            print(token)
+            print(token.access_token)
+            res = {
+                "username": username,
+                "name": name,
+                "email": user_email,
+                "token": str(token.access_token),
+                "refresh": str(token)
+            }
+            return
+
+
+class CustomTokenVerifyView(TokenVerifyView):
+    """ custom token verify view, for both normal token and GitHub social token """
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        """ post request for normal token verify and GitHub social token verify """
+        token = request.data.get('token')
+        """ get token """
+        if token is None:
+            return Response({"error": "token not provided"}, status=status.HTTP_400_BAD_REQUEST)
+        """ check if token is provided """
+        try:
+            return super().post(request, *args, **kwargs)
+        except InvalidToken as e:
+            """ if it is not a jwt token, then check if it is a GitHub social token """
+            headers = {'Authorization': f'token {token}'}  # headers for GitHub API
+            response = requests.get('https://api.github.com/user', headers=headers)
+            if response.status_code == 200:
+                """ if GitHub API returns 200, then the token is valid """
+                return Response({"message": "token is valid"}, status=status.HTTP_200_OK)
+            else:
+                """ if GitHub API returns other status code, then the token is invalid """
+                return Response({"error": "token is invalid"}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 def home(request):
-    # print(type(request))
-    # print(request.user)
     return render(request, 'home.html')

@@ -57,6 +57,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",  # support cross-origin
     "social_django.middleware.SocialAuthExceptionMiddleware",  # add this line
+
 ]
 
 ROOT_URLCONF = "main.urls"
@@ -150,8 +151,8 @@ REST_FRAMEWORK = {
 
 # token settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=7),  # 7 days
-    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=14),  # 14 days
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=5),  # 5 minutes
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=7),  # 7 days
     "ROTATE_REFRESH_TOKENS": False,  # refresh token will not be rotated
     "BLACKLIST_AFTER_ROTATION": True,  # black list after rotation
     "ALGORITHM": "HS256",  # algorithm used to encode token
@@ -166,8 +167,9 @@ SIMPLE_JWT = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',  # default, support username and password login
-    'social_core.backends.github.GithubOAuth2'  # support github login
+    'social_core.backends.github.GithubOAuth2',  # support github login
+    'common.authentication.MyBackend',
+    # 'django.contrib.auth.backends.ModelBackend',  # default, support username and password login
 )
 
 SOCIAL_AUTH_GITHUB_KEY = '974506dca0d1e496cf48'
@@ -176,9 +178,4 @@ SOCIAL_AUTH_GITHUB_USE_OPENID_AS_USERNAME = True
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/api/user/home/'  # TODO: change to your own url
 SOCIAL_AUTH_URL_NAMESPACE = 'social'  # new added
 
-SOCIALACCOUNT_PROVIDERS = {
-    'github': {
-        'SCOPE': ['user:email'],
-        'VERIFIED_EMAIL': True,
-    }
-}
+SOCIAL_AUTH_GITHUB_SCOPE = ['user:email', 'read:user']
