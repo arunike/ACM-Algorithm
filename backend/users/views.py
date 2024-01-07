@@ -22,6 +22,7 @@ class LoginView(TokenObtainPairView):
         result['username'] = serializer.user.username
         result['name'] = serializer.user.name
         result['email'] = serializer.user.email
+        result['token'] = result.pop('access')
 
         return Response(result, status=status.HTTP_200_OK)
 
