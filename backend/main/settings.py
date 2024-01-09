@@ -175,7 +175,7 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GITHUB_KEY = '974506dca0d1e496cf48'
 SOCIAL_AUTH_GITHUB_SECRET = '30530b773370b68abaa82a53f7af906ccc98fc90'
 SOCIAL_AUTH_GITHUB_USE_OPENID_AS_USERNAME = True
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/api/user/home/'  # TODO: change to your own url
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/api/user/github-credential-redirect/'  # TODO: change to your own url
 SOCIAL_AUTH_URL_NAMESPACE = 'social'  # new added
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email', 'read:user']

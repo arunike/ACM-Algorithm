@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import status
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.views import APIView
@@ -18,22 +19,29 @@ from users.serializer import UserSerializer
 
 
 class LoginView(TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request: Request, *args, **kwargs):
+        """ login view """
+        login_type = request.data.get('login_type')
+        if login_type == 'normal':
+            serializer = self.get_serializer(data=request.data)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-        except TokenError as e:
-            raise InvalidToken(e.args[0])
+            try:
+                serializer.is_valid(raise_exception=True)
+            except TokenError as e:
+                raise InvalidToken(e.args[0])
 
-        result = serializer.validated_data
-        result['username'] = serializer.user.username
-        result['name'] = serializer.user.name
-        result['email'] = serializer.user.email
-        result['id'] = serializer.user.id
-        result['token'] = result.pop('access')
-
-        return Response(result, status=status.HTTP_200_OK)
+            result = serializer.validated_data
+            result['username'] = serializer.user.username
+            result['name'] = serializer.user.name
+            result['email'] = serializer.user.email
+            result['id'] = serializer.user.id
+            result['token'] = result.pop('access')
+            return Response(result, status=status.HTTP_200_OK)
+        elif login_type == 'github':
+            """ redirect to GitHub login page """
+            return redirect('social:begin', args=['github'])
+        else:
+            return Response({"error": "login type not provided"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RegisterView(APIView):
@@ -49,6 +57,7 @@ class RegisterView(APIView):
         """ name """
         email = request.data.get('email')
         """ email """
+
         if not all([username, password, confirm_password, name, email]):
             return Response({"error": "missing data"}, status=status.HTTP_400_BAD_REQUEST)
         """ check if data is missing """
@@ -71,7 +80,6 @@ class RegisterView(APIView):
             "name": name,
             "email": email
         }
-
         return Response(data=res, status=status.HTTP_201_CREATED)
 
 
@@ -95,7 +103,8 @@ class GitHubLoginView(APIView):
             user = User.objects.filter(email=user_email).first()
             if user is None:
                 random_password = User.objects.make_random_password()
-                user = User.objects.create_user(username=username, password=random_password, name=name, email=user_email)
+                user = User.objects.create_user(username=username, password=random_password, name=name,
+                                                email=user_email)
                 user.save()
             user = User.objects.get(email=user_email)
             token = RefreshToken.for_user(user)
@@ -116,6 +125,7 @@ class GitHubLoginView(APIView):
 
 class CustomTokenVerifyView(TokenVerifyView):
     """ custom token verify view, for both normal token and GitHub social token """
+
     def post(self, request: Request, *args, **kwargs) -> Response:
         """ post request for normal token verify and GitHub social token verify """
         token = request.data.get('token')
