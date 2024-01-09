@@ -85,18 +85,20 @@ const LoginPage = () => {
   const handleSubmit = () => {
     if (!validatePassword(values.password)) {
       console.error('Validation failed');
+
       return;
     };
 
     const user = {
       username: values.username,
-      password: values.password
+      password: values.password,
+      login_type: 'normal',
     };
 
     console.log("Logging in", user);
 
-    axios.post('http://localhost:8000/api/user/login/', user)
-    .then(resp => {
+    axios.post('http://localhost:8000/api/user/login', user, {
+    }).then(resp => {
       console.log("Login successful", resp.data);
 
       router.push('http://localhost:3000/');
@@ -104,28 +106,37 @@ const LoginPage = () => {
       toast.success("Login successful");
     }).catch(err => {
       console.log(err);
-      // toast.error("hi");
+
       toast.error(err.response.data.error[0]);
     });
   };
 
-  // function handleGithubLogin(user) {
-  //   console.log(user);
-  //   axios.post('http://localhost:8000/api/user/login/', user)
-  //     .then(resp => {
-  //       console.log("Login successful", resp.data);
+  const handleGithubLogin = () => {
+    const user = {
+      id: values.id,
+      username: values.username,
+      name: values.name,
+      email: values.email,
+      token: values.token,
+      refresh: values.refresh,
+      login_type: 'github',
+    };
 
-  //       router.push('http://127.0.0.1:8000/login/github/login/github');
+    console.log("Logging in with GitHub", user);
 
-  //       toast.success("Login successful");
-  //     });
-  // }
+    axios.post('http://127.0.0.1:8000/api/user/login/', user, {
+    }).headers({
+      'Access-Control-Allow-Origin': '*',
+    }).then(resp => {
+      console.log("Login successful", resp.data);
 
-  useEffect(() => {
-    if (router.asPath === 'http://127.0.0.1:8000/api/user/home/') {
-      router.push('/');
-    }
-  }, [router.asPath]);
+      // router.push('http://localhost:3000/');
+
+      toast.success("Login successful");
+    }).catch(err => {
+      console.log(err);
+    });
+  };
 
   return (
     <Box className='content-center'>

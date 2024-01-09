@@ -1,6 +1,6 @@
-common/__pycache__/
-users/__pycache__/
-users/migrations/__pycache__/
-
+/common/__pycache__/
+/users/__pycache__/
+/users/migrations/__pycache__/
+/main/__pycache__/
 
 .DS_STORE

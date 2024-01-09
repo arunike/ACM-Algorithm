@@ -179,3 +179,4 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/api/user/github-credential-redirect/'  # TODO
 SOCIAL_AUTH_URL_NAMESPACE = 'social'  # new added
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email', 'read:user']
+CORS_ALLOW_ALL_ORIGINS = True

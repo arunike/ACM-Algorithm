@@ -16,6 +16,7 @@ import requests
 
 from users.permissions import UserPermissions
 from users.serializer import UserSerializer
+from django.http import HttpResponseRedirect
 
 
 class LoginView(TokenObtainPairView):
@@ -38,8 +39,11 @@ class LoginView(TokenObtainPairView):
             result['token'] = result.pop('access')
             return Response(result, status=status.HTTP_200_OK)
         elif login_type == 'github':
+            print('github')
             """ redirect to GitHub login page """
-            return redirect('social:begin', args=['github'])
+            # return redirect('social:begin', 'github')
+            # return redirect('http://127.0.0.1:8000/login/github/login/github/')
+            return HttpResponseRedirect(reverse('social:begin', args=['github']))
         else:
             return Response({"error": "login type not provided"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -119,7 +123,7 @@ class GitHubLoginView(APIView):
                 "token": str(token.access_token),
                 "refresh": str(token)
             }
-            # response = requests.post('http://localhost:3000/login-credentials', data=res)
+            response = requests.post('http://localhost:3000/login-credentials/', data=res)
             return Response(data=res, status=status.HTTP_200_OK)
 
 

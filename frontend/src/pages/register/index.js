@@ -52,11 +52,14 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 
 const RegisterPage = () => {
   const [values, setValues] = useState({
+    id: '',
     username: '',
     name: '',
     email: '',
     password: '',
     confirm_password: '',
+    token: '',
+    refresh: '',
     showPassword: false,
     errors: {},
     isFormValid: false,
@@ -118,6 +121,7 @@ const RegisterPage = () => {
   const handleSubmit = () => {
     if (!values.isFormValid) {
       console.error('Validation failed');
+
       return;
     };
 
@@ -131,19 +135,11 @@ const RegisterPage = () => {
 
     axios.post('http://localhost:8000/api/user/register/', user)
     .then(resp => {
-      // console.log("Registration successful", resp.data);
       router.push('http://localhost:3000/login/');
-      toast.success("Registration successful");
+      toast.success(resp);
     }).catch(err => {
       toast.error(err.response.data.error);
     });
-
-    // console.log("Form Submitted");
-  };
-
-  const handleGithubLogin = () => {
-    setAnchorEl(null);
-    router.push('http://localhost:3000/');
   };
 
   return (
