@@ -7,3 +7,4 @@ djangorestframework-simplejwt
 django-allauth
 social-auth-app-django
 requests
+Pillow

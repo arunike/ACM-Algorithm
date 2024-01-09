@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from rest_framework import status
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -9,6 +12,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenVerifyView
 from users.models import User
 from social_django.models import UserSocialAuth
 import requests
+
+from users.permissions import UserPermissions
+from users.serializer import UserSerializer
 
 
 class LoginView(TokenObtainPairView):
@@ -24,6 +30,7 @@ class LoginView(TokenObtainPairView):
         result['username'] = serializer.user.username
         result['name'] = serializer.user.name
         result['email'] = serializer.user.email
+        result['id'] = serializer.user.id
         result['token'] = result.pop('access')
 
         return Response(result, status=status.HTTP_200_OK)
@@ -59,6 +66,7 @@ class RegisterView(APIView):
         new_user.save()
         """ save new user """
         res = {
+            "id": new_user.id,
             "username": username,
             "name": name,
             "email": email
@@ -70,7 +78,7 @@ class RegisterView(APIView):
 class GitHubLoginView(APIView):
     """ GitHub login redirect view"""
 
-    def get(self, request):
+    def get(self, request: Request, *args, **kwargs) -> Response:
         """ get request """
         if request.user.is_authenticated:
             github_social_auth = UserSocialAuth.objects.get(user=request.user, provider='github')
@@ -91,16 +99,19 @@ class GitHubLoginView(APIView):
                 user.save()
             user = User.objects.get(email=user_email)
             token = RefreshToken.for_user(user)
+            print(user.id)
             print(token)
             print(token.access_token)
             res = {
+                "id": user.id,
                 "username": username,
                 "name": name,
                 "email": user_email,
                 "token": str(token.access_token),
                 "refresh": str(token)
             }
-            return
+            # response = requests.post('http://localhost:3000/login', data=res)
+            return Response(data=res, status=status.HTTP_200_OK)
 
 
 class CustomTokenVerifyView(TokenVerifyView):
@@ -125,6 +136,32 @@ class CustomTokenVerifyView(TokenVerifyView):
                 """ if GitHub API returns other status code, then the token is invalid """
                 return Response({"error": "token is invalid"}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+class UserViewSet(GenericViewSet, RetrieveModelMixin):
+    """ user view """
+    queryset = User.objects.all()
+    """ queryset """
+    serializer_class = UserSerializer
+    """ serializer class """
+    lookup_field = 'id'
+    """ lookup field """
+    permission_classes = [IsAuthenticated, UserPermissions]
+    """ permission classes """
+
+    def upload_avatar(self, request: Request) -> Response:
+        """ upload avatar """
+        user = request.user
+        """ get user """
+        avatar = request.data.get('avatar')
+        """ get avatar """
+        if avatar is None:
+            return Response({"error": "avatar not provided"}, status=status.HTTP_400_BAD_REQUEST)
+        """ check if avatar is provided """
+        user.avatar = avatar
+        """ set avatar """
+        user.save()
+        """ save user """
+        return Response({"message": "avatar uploaded successfully"}, status=status.HTTP_200_OK)
 
 
 def home(request):

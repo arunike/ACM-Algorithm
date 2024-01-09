@@ -12,7 +12,8 @@ class User(AbstractUser, BaseModel):
     """ password """
     email = models.EmailField(verbose_name="email")
     """ email """
-
+    avatar = models.ImageField(verbose_name="avatar", null=True, blank=True)
+    """ avatar """
     class Meta:
         db_table = "user"
         verbose_name = "user"
