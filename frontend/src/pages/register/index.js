@@ -56,7 +56,7 @@ const RegisterPage = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    confirm_password: '',
     showPassword: false,
     errors: {},
     isFormValid: false,
@@ -66,18 +66,18 @@ const RegisterPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const validateUsername = (username) => username.length >= 4;
-  const validateName = (name) => name.length >= 4;
+  const validateUsername = (username) => username.length >= 5;
+  const validateName = (name) => name.length >= 5;
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePassword = (password) => password.length >= 8;
-  const validateConfirmPassword = (password, confirmPassword) => password === confirmPassword;
+  const validateConfirmPassword = (password, confirm_password) => password === confirm_password;
 
   const updateFormValidity = () => {
     const isUsernameValid = validateUsername(values.username);
     const isNameValid = validateName(values.name);
     const isEmailValid = validateEmail(values.email);
     const isPasswordValid = validatePassword(values.password);
-    const isConfirmPasswordValid = validateConfirmPassword(values.password, values.confirmPassword);
+    const isConfirmPasswordValid = validateConfirmPassword(values.password, values.confirm_password);
     setValues(values => ({ ...values, isFormValid: isUsernameValid && isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid }));
   };
 
@@ -86,14 +86,14 @@ const RegisterPage = () => {
     let error = '';
 
     if (prop === 'username' && !validateUsername(value)) {
-      error = 'Username must be at least 4 characters';
+      error = 'Username must be at least 5 characters';
     } else if (prop === 'name' && !validateName(value)) {
-      error = 'Name must be at least 4 characters';
+      error = 'Name must be at least 5 characters';
     } else if (prop === 'email' && !validateEmail(value)) {
       error = 'Invalid email format';
     } else if (prop === 'password' && !validatePassword(value)) {
       error = 'Password must be at least 8 characters';
-    } else if (prop === 'confirmPassword' && !validateConfirmPassword(values.password, value)) {
+    } else if (prop === 'confirm_password' && !validateConfirmPassword(values.password, value)) {
       error = 'Passwords do not match';
     }
 
@@ -133,15 +133,16 @@ const RegisterPage = () => {
       name: values.name,
       email: values.email,
       password: values.password,
+      confirm_password: values.confirm_password,
     };
 
-    axios.post('http://localhost:8000/auth/signup/', user)
+    axios.post('http://localhost:8000/api/user/register/', user)
     .then(resp => {
       // console.log("Registration successful", resp.data);
       router.push('http://localhost:3000/login/');
       toast.success("Registration successful");
     }).catch(err => {
-      toast.error(err.response.data.message);
+      toast.error(err.response.data.error);
     });
 
     // console.log("Form Submitted");
@@ -300,11 +301,11 @@ const RegisterPage = () => {
               <InputLabel htmlFor='auth-register-confirm-password'>Confirm Password</InputLabel>
               <OutlinedInput
                 label='Confirm Password'
-                value={values.confirmPassword}
+                value={values.confirm_password}
                 id='auth-register-confirm-password'
-                onChange={handleChange('confirmPassword')}
+                onChange={handleChange('confirm_password')}
                 type={values.showPassword ? 'text' : 'password'}
-                error={!!values.errors.confirmPassword}
+                error={!!values.errors.confirm_password}
                 endAdornment={
                   <InputAdornment position='end'>
                     <IconButton
@@ -318,7 +319,7 @@ const RegisterPage = () => {
                   </InputAdornment>
                 }
               />
-              {values.errors.confirmPassword && <Typography color="error">{values.errors.confirmPassword}</Typography>}
+              {values.errors.confirm_password && <Typography color="error">{values.errors.confirm_password}</Typography>}
             </FormControl>
 
             <FormControlLabel

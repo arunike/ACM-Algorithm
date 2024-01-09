@@ -50,7 +50,7 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 
 const LoginPage = () => {
   const [values, setValues] = useState({
-    email: '',
+    username: '',
     password: '',
     showPassword: false,
     errors: {}
@@ -59,16 +59,13 @@ const LoginPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePassword = (password) => password.length >= 8;
 
   const handleChange = prop => event => {
     const { value } = event.target;
     let error = '';
 
-    if (prop === 'email' && !validateEmail(value)) {
-      error = 'Invalid email format';
-    } else if (prop === 'password' && !validatePassword(value)) {
+    if (prop === 'password' && !validatePassword(value)) {
       error = 'Password must be at least 8 characters';
     }
 
@@ -93,19 +90,19 @@ const LoginPage = () => {
   };
 
   const handleSubmit = () => {
-    if (!validateEmail(values.email) || !validatePassword(values.password)) {
+    if (!validatePassword(values.password)) {
       console.error('Validation failed');
       return;
     };
 
     const user = {
-      email: values.email,
+      username: values.username,
       password: values.password
     };
 
     console.log("Logging in", user);
 
-    axios.post('http://localhost:8000/auth/login/', user)
+    axios.post('http://localhost:8000/api/user/login/', user)
     .then(resp => {
       console.log("Login successful", resp.data);
 
@@ -113,9 +110,9 @@ const LoginPage = () => {
 
       toast.success("Login successful");
     }).catch(err => {
-      console.log("Login failed", err.response.data.message);
-
-      toast.error(err.response.data.message);
+      console.log(err);
+      // toast.error("hi");
+      toast.error(err.response.data.error[0]);
     });
   };
 
@@ -210,12 +207,12 @@ const LoginPage = () => {
             <TextField
               autoFocus
               fullWidth
-              id='email'
-              label='Email'
-              value={values.email}
-              onChange={handleChange('email')}
-              error={!!values.errors.email}
-              helpertext={values.errors.email}
+              id='username'
+              label='Username'
+              value={values.username}
+              onChange={handleChange('username')}
+              error={!!values.errors.username}
+              helpertext={values.errors.username}
               sx={{ marginBottom: 4 }}
             />
 
@@ -275,7 +272,7 @@ const LoginPage = () => {
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
-                <IconButton component='a' onClick={() => handleDropdownClose('http://localhost:8000/login/')}>
+                <IconButton component='a' onClick={() => handleDropdownClose('http://127.0.0.1:8000/login/github/login/github/')}>
                   <Github
                     sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
                   />
