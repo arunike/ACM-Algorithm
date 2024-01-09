@@ -111,13 +111,6 @@ const RegisterPage = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const handleDropdownClose = url => {
-    if (url) {
-      router.push(url)
-    }
-    setAnchorEl(null)
-  };
-
   const handleCheckboxChange = (event) => {
     setChecked(event.target.checked);
   };
@@ -146,6 +139,11 @@ const RegisterPage = () => {
     });
 
     // console.log("Form Submitted");
+  };
+
+  const handleGithubLogin = () => {
+    setAnchorEl(null);
+    router.push('http://localhost:3000/');
   };
 
   return (
@@ -358,7 +356,7 @@ const RegisterPage = () => {
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
-                <IconButton component='a' onClick={() => handleDropdownClose('http://127.0.0.1:8000/login/github/login/github/')}>
+                <IconButton component='a' onClick={handleGithubLogin}>
                   <Github
                     sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
                   />

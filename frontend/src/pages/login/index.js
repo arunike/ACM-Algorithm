@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -82,13 +82,6 @@ const LoginPage = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const handleDropdownClose = url => {
-    if (url) {
-      router.push(url)
-    }
-    setAnchorEl(null)
-  };
-
   const handleSubmit = () => {
     if (!validatePassword(values.password)) {
       console.error('Validation failed');
@@ -115,6 +108,24 @@ const LoginPage = () => {
       toast.error(err.response.data.error[0]);
     });
   };
+
+  // function handleGithubLogin(user) {
+  //   console.log(user);
+  //   axios.post('http://localhost:8000/api/user/login/', user)
+  //     .then(resp => {
+  //       console.log("Login successful", resp.data);
+
+  //       router.push('http://127.0.0.1:8000/login/github/login/github');
+
+  //       toast.success("Login successful");
+  //     });
+  // }
+
+  useEffect(() => {
+    if (router.asPath === 'http://127.0.0.1:8000/api/user/home/') {
+      router.push('/');
+    }
+  }, [router.asPath]);
 
   return (
     <Box className='content-center'>
@@ -272,7 +283,7 @@ const LoginPage = () => {
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
-                <IconButton component='a' onClick={() => handleDropdownClose('http://127.0.0.1:8000/login/github/login/github/')}>
+                <IconButton component='a' onClick={handleGithubLogin}>
                   <Github
                     sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
                   />

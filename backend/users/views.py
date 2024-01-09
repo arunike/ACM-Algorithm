@@ -110,7 +110,7 @@ class GitHubLoginView(APIView):
                 "token": str(token.access_token),
                 "refresh": str(token)
             }
-            # response = requests.post('http://localhost:3000/login', data=res)
+            # response = requests.post('http://localhost:3000/login-credentials', data=res)
             return Response(data=res, status=status.HTTP_200_OK)
 
 

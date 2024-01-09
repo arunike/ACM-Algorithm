@@ -1,10 +1,8 @@
-// ** Icon imports
-import Login from 'mdi-material-ui/Login'
-import Logout from 'mdi-material-ui/Logout'
-import HomeOutline from 'mdi-material-ui/HomeOutline'
-import AccountCogOutline from 'mdi-material-ui/AccountCogOutline'
-import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
-import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
+import Logout from 'mdi-material-ui/Logout';
+import HomeOutline from 'mdi-material-ui/HomeOutline';
+import AccountCogOutline from 'mdi-material-ui/AccountCogOutline';
+import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline';
+import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline';
 
 const navigation = () => {
   return [
@@ -37,6 +35,11 @@ const navigation = () => {
       title: 'Logout',
       icon: Logout,
       path: 'login',
+    },
+    {
+      title: 'login-credentials',
+      icon: Logout,
+      path: '/login-credentials',
     }
   ]
 }
