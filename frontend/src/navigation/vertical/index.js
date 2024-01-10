@@ -3,8 +3,16 @@ import HomeOutline from 'mdi-material-ui/HomeOutline';
 import AccountCogOutline from 'mdi-material-ui/AccountCogOutline';
 import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline';
 import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline';
+import {useEffect, useState} from "react";
 
-const navigation = () => {
+const Navigation = () => {
+  const [id, setId] = useState(0);
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idFromUrl = urlParams.get('id');
+    setId(Number(idFromUrl));
+  }, []);
+
   return [
     {
       title: 'Dashboard',
@@ -14,7 +22,7 @@ const navigation = () => {
     {
       title: 'Account Settings',
       icon: AccountCogOutline,
-      path: '/account-settings'
+      path: `/account-settings?id=${id}`,
     },
     {
       sectionTitle: 'Pages'
@@ -39,4 +47,4 @@ const navigation = () => {
   ]
 }
 
-export default navigation
+export default Navigation

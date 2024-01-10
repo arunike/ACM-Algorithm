@@ -39,15 +39,11 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",  # JWT: JSON Web Token
     "corsheaders",  # support cross-origin
     "users",  # user app
-    # "django.contrib.sites",  # allauth
-    # "allauth",  # allauth
-    # "allauth.account",  # allauth
-    # "allauth.socialaccount",  # allauth
-    # "allauth.socialaccount.providers.github",  # allauth
     "social_django",  # social_django for social login
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # support cross-origin
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -55,7 +51,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # support cross-origin
     "social_django.middleware.SocialAuthExceptionMiddleware",  # add this line
 
 ]

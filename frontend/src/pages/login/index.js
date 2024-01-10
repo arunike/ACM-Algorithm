@@ -111,33 +111,6 @@ const LoginPage = () => {
     });
   };
 
-  const handleGitHubCallback = async () => {
-    console.log('handleGitHubCallback called');
-    try {
-      const urlSearchParams = new URLSearchParams(window.location.search);
-      const token = urlSearchParams.get('token');
-
-      if (token) {
-        localStorage.setItem('token', token);
-        console.log('Token received and stored:', token);
-
-        return token;
-      } else {
-        console.error('Token not received in callback URL');
-      }
-    } catch (error) {
-      console.error('Error handling GitHub callback:', error);
-    }
-  };
-
-
-  useEffect(() => {
-    console.log('useEffect called');
-    handleGitHubCallback().then(token => {
-      console.log('GitHub Access Token:', token);
-    });
-  }, []);
-
   const handleGithubLogin = async () => {
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/user/login/', {

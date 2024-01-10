@@ -12,7 +12,7 @@ function LoginCredentials() {
     let id = urlParams.get('id');
     localStorage.setItem('token', token);
     console.log(token);
-    router.push(`http://localhost:3000?id=${id}`);
+    router.push(`http://127.0.0.1:3000?id=${id}`);
   }, []);
 
 
