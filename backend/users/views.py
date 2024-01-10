@@ -41,11 +41,8 @@ class LoginView(TokenObtainPairView):
         elif login_type == 'github':
             # print('github')
             """ redirect to GitHub login page """
-            # return redirect('social:begin', 'github')
-            # return redirect('http://127.0.0.1:8000/login/github/login/github/')
             redirect_url = reverse('social:begin', args=['github'])
-            # resp = redirect(redirect_url, status=status.HTTP_302_FOUND)
-            return Response({"redirect_url": redirect_url}, status=status.HTTP_200_OK)
+            return Response({"redirect_url": f"http://127.0.0.1:8000{redirect_url}"}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "login type not provided"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -92,7 +89,7 @@ class RegisterView(APIView):
 class GitHubLoginView(APIView):
     """ GitHub login redirect view"""
 
-    def get(self, request: Request, *args, **kwargs) -> Response:
+    def get(self, request: Request, *args, **kwargs) -> HttpResponseRedirect:
         """ get request """
         if request.user.is_authenticated:
             github_social_auth = UserSocialAuth.objects.get(user=request.user, provider='github')
@@ -117,16 +114,18 @@ class GitHubLoginView(APIView):
             print(user.id)
             print(token)
             print(token.access_token)
-            res = {
-                "id": user.id,
-                "username": username,
-                "name": name,
-                "email": user_email,
-                "token": str(token.access_token),
-                "refresh": str(token)
-            }
-            response = requests.post('http://localhost:3000/login-credentials/', data=res)
-            return Response(data=res, status=status.HTTP_200_OK)
+            # res = {
+            #     "id": user.id,
+            #     "username": username,
+            #     "name": name,
+            #     "email": user_email,
+            #     "token": str(token.access_token),
+            #     "refresh": str(token)
+            # }
+            frontend_url = f"http://127.0.0.1:3000/login-credentials?id={user.id}&username={username}&name={name}&email={user_email}&token={str(token.access_token)}&refresh={str(token)}"
+
+            return HttpResponseRedirect(redirect_to=frontend_url, status=status.HTTP_302_FOUND)
+
 
 
 class CustomTokenVerifyView(TokenVerifyView):
