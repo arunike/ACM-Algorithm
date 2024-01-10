@@ -111,31 +111,47 @@ const LoginPage = () => {
     });
   };
 
-  const handleGithubLogin = () => {
-    const user = {
-      id: values.id,
-      username: values.username,
-      name: values.name,
-      email: values.email,
-      token: values.token,
-      refresh: values.refresh,
-      login_type: 'github',
-    };
+  const handleGitHubCallback = async () => {
+    console.log('handleGitHubCallback called');
+    try {
+      const urlSearchParams = new URLSearchParams(window.location.search);
+      const token = urlSearchParams.get('token');
 
-    console.log("Logging in with GitHub", user);
+      if (token) {
+        localStorage.setItem('token', token);
+        console.log('Token received and stored:', token);
 
-    axios.post('http://127.0.0.1:8000/api/user/login/', user, {
-    }).headers({
-      'Access-Control-Allow-Origin': '*',
-    }).then(resp => {
-      console.log("Login successful", resp.data);
+        return token;
+      } else {
+        console.error('Token not received in callback URL');
+      }
+    } catch (error) {
+      console.error('Error handling GitHub callback:', error);
+    }
+  };
 
-      // router.push('http://localhost:3000/');
 
-      toast.success("Login successful");
-    }).catch(err => {
-      console.log(err);
+  useEffect(() => {
+    console.log('useEffect called');
+    handleGitHubCallback().then(token => {
+      console.log('GitHub Access Token:', token);
     });
+  }, []);
+
+  const handleGithubLogin = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/user/login/', {
+        login_type: 'github',
+      });
+
+      if (response.data && response.data.redirect_url) {
+        window.location.href = response.data.redirect_url;
+      } else {
+        console.error('Error: Unexpected response', response);
+      }
+    } catch(err) {
+      toast.error(err);
+    }
   };
 
   return (
