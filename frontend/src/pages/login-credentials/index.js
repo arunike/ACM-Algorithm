@@ -11,7 +11,6 @@ function LoginCredentials() {
     const token = urlParams.get('token');
     let id = urlParams.get('id');
     localStorage.setItem('token', token);
-    console.log(token);
     router.push(`http://127.0.0.1:3000?id=${id}`);
   }, []);
 
@@ -19,7 +18,7 @@ function LoginCredentials() {
 
   return (
     <div>
-      <h1>hello</h1>
+      <h1>Redirecting...</h1>
     </div>
   );
 }

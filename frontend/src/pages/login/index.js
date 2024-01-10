@@ -79,9 +79,7 @@ const LoginPage = () => {
   const handleMouseDownPassword = event => {
     event.preventDefault()
   };
-
-  const [anchorEl, setAnchorEl] = useState(null);
-
+  
   const handleSubmit = () => {
     if (!validatePassword(values.password)) {
       console.error('Validation failed');

@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
 
 # token settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=5),  # 5 minutes
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=7),  # 7 days
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=7),  # 7 days
     "ROTATE_REFRESH_TOKENS": False,  # refresh token will not be rotated
     "BLACKLIST_AFTER_ROTATION": True,  # black list after rotation

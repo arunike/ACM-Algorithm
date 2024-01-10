@@ -1,5 +1,5 @@
-import { useState, Fragment } from 'react';
-
+import { useState, Fragment, useEffect } from 'react';
+import axios from "axios";
 import { useRouter } from 'next/router';
 
 import Box from '@mui/material/Box';
@@ -11,11 +11,9 @@ import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
-import CogOutline from 'mdi-material-ui/CogOutline';
 import EmailOutline from 'mdi-material-ui/EmailOutline';
 import LogoutVariant from 'mdi-material-ui/LogoutVariant';
 import AccountOutline from 'mdi-material-ui/AccountOutline';
-import MessageOutline from 'mdi-material-ui/MessageOutline';
 import HelpCircleOutline from 'mdi-material-ui/HelpCircleOutline';
 
 const BadgeContentSpan = styled('span')(({ theme }) => ({
@@ -28,6 +26,8 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
 
 const UserDropdown = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [userInfo, setUserInfo] = useState({});
+  const [id, setId] = useState(0);
 
   const router = useRouter();
 
@@ -41,6 +41,25 @@ const UserDropdown = () => {
     }
     setAnchorEl(null)
   };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idFromUrl = urlParams.get('id');
+    setId(Number(idFromUrl));
+  }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idFromUrl = Number(urlParams.get('id'));
+    const token = localStorage.getItem('token');
+    axios.get(`http://127.0.0.1:8000/api/user/user/${idFromUrl}/`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    }).then((resp) => {
+      setUserInfo(resp.data);
+    });
+  }, []);
 
   const styles = {
     py: 2,
@@ -66,10 +85,10 @@ const UserDropdown = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Avatar
-          alt='John Doe'
+          alt={userInfo.name}
           onClick={handleDropdownOpen}
           sx={{ width: 40, height: 40 }}
-          src='/images/avatars/1.png'
+          src={userInfo.avatar}
         />
       </Badge>
 
@@ -88,20 +107,17 @@ const UserDropdown = () => {
               badgeContent={<BadgeContentSpan />}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-              <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
+              <Avatar alt={userInfo.name} src={userInfo.avatar} sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
 
             <Box sx={{ display: 'flex', marginLeft: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>John Doe</Typography>
-              <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-                Admin
-              </Typography>
+              <Typography sx={{ fontWeight: 600 }}>{userInfo.name}</Typography>
             </Box>
           </Box>
         </Box>
 
         <Divider sx={{ mt: 0, mb: 1 }} />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/account-settings')}>
+        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose(`/account-settings?id=${id}`)}>
           <Box sx={styles}>
             <AccountOutline sx={{ marginRight: 2 }} />
             Profile
@@ -115,28 +131,14 @@ const UserDropdown = () => {
           </Box>
         </MenuItem>
 
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
-          <Box sx={styles}>
-            <MessageOutline sx={{ marginRight: 2 }} />
-            Chat
-          </Box>
-        </MenuItem>
-
         <Divider />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
-          <Box sx={styles}>
-            <CogOutline sx={{ marginRight: 2 }} />
-            Settings
-          </Box>
-        </MenuItem>
-
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
             <HelpCircleOutline sx={{ marginRight: 2 }} />
             FAQ
           </Box>
         </MenuItem>
-        
+
         <Divider />
         <MenuItem sx={{ py: 2 }} onClick={() => handleDropdownClose('/login')}>
           <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
@@ -147,4 +149,4 @@ const UserDropdown = () => {
   )
 }
 
-export default UserDropdown
+export default UserDropdown;
