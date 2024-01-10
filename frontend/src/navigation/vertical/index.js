@@ -36,11 +36,6 @@ const navigation = () => {
       icon: Logout,
       path: 'login',
     },
-    {
-      title: 'login-credentials',
-      icon: Logout,
-      path: '/login-credentials',
-    }
   ]
 }
 
