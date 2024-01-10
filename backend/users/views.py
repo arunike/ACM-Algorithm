@@ -39,11 +39,13 @@ class LoginView(TokenObtainPairView):
             result['token'] = result.pop('access')
             return Response(result, status=status.HTTP_200_OK)
         elif login_type == 'github':
-            print('github')
+            # print('github')
             """ redirect to GitHub login page """
             # return redirect('social:begin', 'github')
             # return redirect('http://127.0.0.1:8000/login/github/login/github/')
-            return HttpResponseRedirect(reverse('social:begin', args=['github']))
+            redirect_url = reverse('social:begin', args=['github'])
+            # resp = redirect(redirect_url, status=status.HTTP_302_FOUND)
+            return Response({"redirect_url": redirect_url}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "login type not provided"}, status=status.HTTP_400_BAD_REQUEST)
 
