@@ -16,8 +16,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import TabInfo from 'src/views/account-settings/TabInfo';
 import TabAccount from 'src/views/account-settings/TabAccount';
 import TabSecurity from 'src/views/account-settings/TabSecurity';
-import AuthenticationCheckin from "../../@core/layouts/components/shared-components/AuthenticationCheck";
-import GetUserInfo from "../../@core/layouts/components/shared-components/GetUserInfo";
+import AuthenticationCheckin from "../../CustomGlobalFunction/AuthenticationCheck";
+import GetUserInfo from "../../CustomGlobalFunction/GetUserInfo";
 
 const Tab = styled(MuiTab)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -46,10 +46,10 @@ const AccountSettings = () => {
   };
 
   useEffect(() => {
-    AuthenticationCheckin();
     GetUserInfo().then(data => {
-      // console.log(data);
       setUserInfo(data);
+    }).catch(err => {
+      AuthenticationCheckin();
     });
   }, []);
 

@@ -348,17 +348,6 @@ const RegisterPage = () => {
                 </Link>
               </Typography>
             </Box>
-
-            <Divider sx={{ my: 5 }}>or</Divider>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Link href='/' passHref>
-                <IconButton component='a' onClick={handleGithubLogin}>
-                  <Github
-                    sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
-                  />
-                </IconButton>
-              </Link>
-            </Box>
           </form>
         </CardContent>
       </Card>

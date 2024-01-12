@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -79,7 +79,7 @@ const LoginPage = () => {
   const handleMouseDownPassword = event => {
     event.preventDefault()
   };
-  
+
   const handleSubmit = () => {
     if (!validatePassword(values.password)) {
       console.error('Validation failed');
@@ -93,12 +93,10 @@ const LoginPage = () => {
       login_type: 'normal',
     };
 
-    console.log("Logging in", user);
-
-    axios.post('http://localhost:8000/api/user/login', user, {
+    axios.post('http://localhost:8000/api/user/login/', user, {
     }).then(resp => {
-      console.log("Login successful", resp.data);
-
+      localStorage.setItem('token', resp.data.token);
+      localStorage.setItem('id', resp.data.id);
       router.push('http://localhost:3000/');
 
       toast.success("Login successful");
@@ -109,17 +107,17 @@ const LoginPage = () => {
     });
   };
 
-  const handleGithubLogin = async () => {
+  const handleGithubLogin = () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/user/login/', {
+      axios.post('http://127.0.0.1:8000/api/user/login/', {
         login_type: 'github',
+      }).then(resp => {
+        if (resp.data && 'redirect_url' in resp.data) {
+          window.location.href = resp.data.redirect_url;
+        } else {
+          console.error('Error: Unexpected response', resp);
+        }
       });
-
-      if (response.data && response.data.redirect_url) {
-        window.location.href = response.data.redirect_url;
-      } else {
-        console.error('Error: Unexpected response', response);
-      }
     } catch(err) {
       toast.error(err);
     }
@@ -281,7 +279,7 @@ const LoginPage = () => {
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
-                <IconButton component='a' onClick={handleGithubLogin}>
+                <IconButton component='a' onClick={(e) => {e.preventDefault(); handleGithubLogin();}}>
                   <Github
                     sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
                   />

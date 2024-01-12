@@ -15,8 +15,7 @@ import EmailOutline from 'mdi-material-ui/EmailOutline';
 import LogoutVariant from 'mdi-material-ui/LogoutVariant';
 import AccountOutline from 'mdi-material-ui/AccountOutline';
 import HelpCircleOutline from 'mdi-material-ui/HelpCircleOutline';
-import AuthenticationCheckin from "./AuthenticationCheck";
-import GetUserInfo from "./GetUserInfo";
+import GetUserInfo from "../../../../CustomGlobalFunction/GetUserInfo";
 
 const BadgeContentSpan = styled('span')(({ theme }) => ({
   width: 8,
@@ -44,10 +43,10 @@ const UserDropdown = () => {
   };
 
   useEffect(() => {
-    AuthenticationCheckin();
-    GetUserInfo().then(data => {
-      // console.log(data);
-      setUserInfo(data);
+    GetUserInfo().then((res) => {
+      setUserInfo(res);
+    }).catch((err) => {
+      window.location.href = "/login";
     });
   }, []);
 

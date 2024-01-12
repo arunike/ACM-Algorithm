@@ -25,7 +25,6 @@ class LoginView(TokenObtainPairView):
         login_type = request.data.get('login_type')
         if login_type == 'normal':
             serializer = self.get_serializer(data=request.data)
-
             try:
                 serializer.is_valid(raise_exception=True)
             except TokenError as e:
@@ -39,7 +38,6 @@ class LoginView(TokenObtainPairView):
             result['token'] = result.pop('access')
             return Response(result, status=status.HTTP_200_OK)
         elif login_type == 'github':
-            # print('github')
             """ redirect to GitHub login page """
             redirect_url = reverse('social:begin', args=['github'])
             return Response({"redirect_url": f"http://127.0.0.1:8000{redirect_url}"}, status=status.HTTP_200_OK)
@@ -114,14 +112,6 @@ class GitHubLoginView(APIView):
             print(user.id)
             print(token)
             print(token.access_token)
-            # res = {
-            #     "id": user.id,
-            #     "username": username,
-            #     "name": name,
-            #     "email": user_email,
-            #     "token": str(token.access_token),
-            #     "refresh": str(token)
-            # }
             frontend_url = f"http://127.0.0.1:3000/login-credentials?id={user.id}&username={username}&name={name}&email={user_email}&token={str(token.access_token)}&refresh={str(token)}"
 
             return HttpResponseRedirect(redirect_to=frontend_url, status=status.HTTP_302_FOUND)
@@ -140,7 +130,6 @@ class CustomTokenVerifyView(TokenVerifyView):
         try:
             return super().post(request, *args, **kwargs)
         except InvalidToken as e:
-
             """ if it is not a jwt token, then check if it is a GitHub social token """
             headers = {'Authorization': f'token {token}'}  # headers for GitHub API
             response = requests.get('https://api.github.com/user', headers=headers)

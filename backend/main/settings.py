@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
 
 # token settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=7),  # 7 days
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=1),  # 1 days
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=7),  # 7 days
     "ROTATE_REFRESH_TOKENS": False,  # refresh token will not be rotated
     "BLACKLIST_AFTER_ROTATION": True,  # black list after rotation
@@ -164,7 +164,6 @@ SIMPLE_JWT = {
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.github.GithubOAuth2',  # support github login
     'common.authentication.MyBackend',
-    # 'django.contrib.auth.backends.ModelBackend',  # default, support username and password login
 )
 
 SOCIAL_AUTH_GITHUB_KEY = '974506dca0d1e496cf48'
