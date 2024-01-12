@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 
 // ** MUI Imports
 import Fab from '@mui/material/Fab'
@@ -46,7 +46,6 @@ const ContentWrapper = styled('main')(({ theme }) => ({
 }))
 
 const VerticalLayout = props => {
-  // ** Props
   const { settings, children, scrollToTop } = props
 
   // ** Vars

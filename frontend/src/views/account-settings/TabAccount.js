@@ -37,7 +37,7 @@ const TabAccount = ({userInfo}) => {
     if (files && files.length !== 0) {
       reader.onload = () => setImgSrc(reader.result)
       reader.readAsDataURL(files[0])
-    };
+    }
   };
 
   return (

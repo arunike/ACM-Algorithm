@@ -15,9 +15,8 @@ import InformationOutline from 'mdi-material-ui/InformationOutline';
 import TabInfo from 'src/views/account-settings/TabInfo';
 import TabAccount from 'src/views/account-settings/TabAccount';
 import TabSecurity from 'src/views/account-settings/TabSecurity';
-
 import 'react-datepicker/dist/react-datepicker.css';
-import axios from "axios";
+import AuthenticationCheckin from "../../@core/layouts/components/shared-components/AuthenticationCheck";
 
 const Tab = styled(MuiTab)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -46,17 +45,7 @@ const AccountSettings = () => {
   };
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idFromUrl = Number(urlParams.get('id'));
-    const token = localStorage.getItem('token');
-
-    axios.get(`http://127.0.0.1:8000/api/user/user/${idFromUrl}/`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-    }).then((resp) => {
-      setUserInfo(resp.data);
-    });
+    AuthenticationCheckin();
   }, []);
 
   return (

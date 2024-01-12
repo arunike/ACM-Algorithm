@@ -15,6 +15,8 @@ import EmailOutline from 'mdi-material-ui/EmailOutline';
 import LogoutVariant from 'mdi-material-ui/LogoutVariant';
 import AccountOutline from 'mdi-material-ui/AccountOutline';
 import HelpCircleOutline from 'mdi-material-ui/HelpCircleOutline';
+import AuthenticationCheckin from "./AuthenticationCheck";
+import GetUserInfo from "./GetUserInfo";
 
 const BadgeContentSpan = styled('span')(({ theme }) => ({
   width: 8,
@@ -43,22 +45,12 @@ const UserDropdown = () => {
   };
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idFromUrl = urlParams.get('id');
-    setId(Number(idFromUrl));
-  }, []);
+    // authentication
+    AuthenticationCheckin();
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idFromUrl = Number(urlParams.get('id'));
-    const token = localStorage.getItem('token');
-    axios.get(`http://127.0.0.1:8000/api/user/user/${idFromUrl}/`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-    }).then((resp) => {
-      setUserInfo(resp.data);
-    });
+    // TODO: after fix GetUserInfo, this should work
+
+    setUserInfo(GetUserInfo());
   }, []);
 
   const styles = {
@@ -117,7 +109,7 @@ const UserDropdown = () => {
         </Box>
 
         <Divider sx={{ mt: 0, mb: 1 }} />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose(`/account-settings?id=${id}`)}>
+        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose(`/account-settings/`)}>
           <Box sx={styles}>
             <AccountOutline sx={{ marginRight: 2 }} />
             Profile

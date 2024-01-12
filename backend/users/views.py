@@ -127,7 +127,6 @@ class GitHubLoginView(APIView):
             return HttpResponseRedirect(redirect_to=frontend_url, status=status.HTTP_302_FOUND)
 
 
-
 class CustomTokenVerifyView(TokenVerifyView):
     """ custom token verify view, for both normal token and GitHub social token """
 
@@ -141,11 +140,13 @@ class CustomTokenVerifyView(TokenVerifyView):
         try:
             return super().post(request, *args, **kwargs)
         except InvalidToken as e:
+
             """ if it is not a jwt token, then check if it is a GitHub social token """
             headers = {'Authorization': f'token {token}'}  # headers for GitHub API
             response = requests.get('https://api.github.com/user', headers=headers)
             if response.status_code == 200:
                 """ if GitHub API returns 200, then the token is valid """
+
                 return Response({"message": "token is valid"}, status=status.HTTP_200_OK)
             else:
                 """ if GitHub API returns other status code, then the token is invalid """
@@ -177,6 +178,34 @@ class UserViewSet(GenericViewSet, RetrieveModelMixin):
         user.save()
         """ save user """
         return Response({"message": "avatar uploaded successfully"}, status=status.HTTP_200_OK)
+
+    def update_personal_info(self, request: Request) -> Response:
+        """ update personal info """
+        user = request.user
+        """ get user """
+        name = request.data.get('name')
+        """ get name """
+        bio = request.data.get('bio')
+        """ get bio """
+        email = request.data.get('email')
+        """ get email """
+        if email is not None:
+            if User.objects.filter(email=email).exists():
+                """ check if email already exists """
+                return Response({"error": "email already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            user.email = email
+            """ set email """
+
+        if name is None:
+            return Response({"error": "name not provided"}, status=status.HTTP_400_BAD_REQUEST)
+        """ check if name is provided """
+        user.name = name
+        """ set name """
+        user.bio = bio
+        """ set bio """
+        user.save()
+        """ save user """
+        return Response({"message": "personal info updated successfully"}, status=status.HTTP_200_OK)
 
 
 def home(request):
