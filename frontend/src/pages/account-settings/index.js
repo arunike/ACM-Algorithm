@@ -7,16 +7,17 @@ import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { styled } from '@mui/material/styles';
 import MuiTab from '@mui/material/Tab';
-
 import AccountOutline from 'mdi-material-ui/AccountOutline';
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline';
 import InformationOutline from 'mdi-material-ui/InformationOutline';
 
+import 'react-datepicker/dist/react-datepicker.css';
+
 import TabInfo from 'src/views/account-settings/TabInfo';
 import TabAccount from 'src/views/account-settings/TabAccount';
 import TabSecurity from 'src/views/account-settings/TabSecurity';
-import 'react-datepicker/dist/react-datepicker.css';
 import AuthenticationCheckin from "../../@core/layouts/components/shared-components/AuthenticationCheck";
+import GetUserInfo from "../../@core/layouts/components/shared-components/GetUserInfo";
 
 const Tab = styled(MuiTab)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -46,6 +47,10 @@ const AccountSettings = () => {
 
   useEffect(() => {
     AuthenticationCheckin();
+    GetUserInfo().then(data => {
+      // console.log(data);
+      setUserInfo(data);
+    });
   }, []);
 
   return (

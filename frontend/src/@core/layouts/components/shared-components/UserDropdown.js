@@ -29,7 +29,6 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
 const UserDropdown = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [userInfo, setUserInfo] = useState({});
-  const [id, setId] = useState(0);
 
   const router = useRouter();
 
@@ -45,12 +44,11 @@ const UserDropdown = () => {
   };
 
   useEffect(() => {
-    // authentication
     AuthenticationCheckin();
-
-    // TODO: after fix GetUserInfo, this should work
-
-    setUserInfo(GetUserInfo());
+    GetUserInfo().then(data => {
+      // console.log(data);
+      setUserInfo(data);
+    });
   }, []);
 
   const styles = {
@@ -81,6 +79,7 @@ const UserDropdown = () => {
           onClick={handleDropdownOpen}
           sx={{ width: 40, height: 40 }}
           src={userInfo.avatar}
+          placeholder=""
         />
       </Badge>
 

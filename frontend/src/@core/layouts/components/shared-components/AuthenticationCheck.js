@@ -11,7 +11,7 @@ const AuthenticationCheckin = () => {
     }).catch((err) =>{
       window.location.replace('/login');
     });
-  }
+}
 
-  export default AuthenticationCheckin;
+export default AuthenticationCheckin;
 
