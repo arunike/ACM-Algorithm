@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -27,7 +27,7 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
   }
 }));
 
-const TabAccount = ({userInfo}) => {
+const TabAccount = ({userInfo, bioInfo}) => {
   const [openAlert, setOpenAlert] = useState(true);
 
   const onChange = file => {
@@ -62,6 +62,17 @@ const TabAccount = ({userInfo}) => {
                 </Typography>
               </Box>
             </Box>
+          </Grid>
+
+          <Grid item xs={12} sx={{ marginTop: 4.8 }}>
+            <TextField
+              fullWidth
+              multiline
+              label='Bio'
+              minRows={2}
+              placeholder='Bio'
+              value={bioInfo || ''}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6}>

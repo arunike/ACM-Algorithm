@@ -153,7 +153,7 @@ class UserViewSet(GenericViewSet, RetrieveModelMixin):
     permission_classes = [IsAuthenticated, UserPermissions]
     """ permission classes """
 
-    def upload_avatar(self, request: Request) -> Response:
+    def upload_avatar(self, request: Request, *args, **kwargs) -> Response:
         """ upload avatar """
         user = request.user
         """ get user """

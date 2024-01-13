@@ -1,4 +1,5 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,11 +10,9 @@ import { styled } from '@mui/material/styles';
 import MuiTab from '@mui/material/Tab';
 import AccountOutline from 'mdi-material-ui/AccountOutline';
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline';
-import InformationOutline from 'mdi-material-ui/InformationOutline';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-import TabInfo from 'src/views/account-settings/TabInfo';
 import TabAccount from 'src/views/account-settings/TabAccount';
 import TabSecurity from 'src/views/account-settings/TabSecurity';
 import AuthenticationCheckin from "../../CustomGlobalFunction/AuthenticationCheck";
@@ -40,6 +39,7 @@ const TabName = styled('span')(({ theme }) => ({
 const AccountSettings = () => {
   const [value, setValue] = useState('account');
   const [userInfo, setUserInfo] = useState({});
+  const [bioInfo, setBioInfo] = useState(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -51,6 +51,14 @@ const AccountSettings = () => {
     }).catch(err => {
       AuthenticationCheckin();
     });
+
+    axios.post(`http://127.0.0.1:8000/api/user/user/${localStorage.getItem('id')}/update-personal-info/`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('token')}`
+      }
+    }).then(res => {
+      setBioInfo(res.data);
+    })
   }, []);
 
   return (
@@ -79,25 +87,13 @@ const AccountSettings = () => {
               </Box>
             }
           />
-          <Tab
-            value='info'
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
-                <TabName>Info</TabName>
-              </Box>
-            }
-          />
         </TabList>
 
         <TabPanel sx={{ p: 0 }} value='account'>
-          <TabAccount userInfo={userInfo}/>
+          <TabAccount userInfo={userInfo} setBioInfo={bioInfo}/>
         </TabPanel>
         <TabPanel sx={{ p: 0 }} value='security'>
           <TabSecurity />
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value='info'>
-          <TabInfo />
         </TabPanel>
       </TabContext>
     </Card>

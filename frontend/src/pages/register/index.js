@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -21,7 +20,6 @@ import MuiCard from '@mui/material/Card';
 import InputAdornment from '@mui/material/InputAdornment';
 import MuiFormControlLabel from '@mui/material/FormControlLabel';
 
-import Github from 'mdi-material-ui/Github';
 import EyeOutline from 'mdi-material-ui/EyeOutline';
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline';
 
@@ -53,7 +51,6 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
 const RegisterPage = () => {
   const [values, setValues] = useState({
     id: '',
-    username: '',
     name: '',
     email: '',
     password: '',
@@ -69,28 +66,25 @@ const RegisterPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const validateUsername = (username) => username.length >= 5;
-  const validateName = (name) => name.length >= 5;
+  const validateName = (name) => name.length >= 4;
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePassword = (password) => password.length >= 8;
   const validateConfirmPassword = (password, confirm_password) => password === confirm_password;
 
-  const updateFormValidity = () => {
-    const isUsernameValid = validateUsername(values.username);
+  useEffect(() => {
     const isNameValid = validateName(values.name);
     const isEmailValid = validateEmail(values.email);
     const isPasswordValid = validatePassword(values.password);
     const isConfirmPasswordValid = validateConfirmPassword(values.password, values.confirm_password);
-    setValues(values => ({ ...values, isFormValid: isUsernameValid && isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid }));
-  };
+
+    setValues(values => ({ ...values, isFormValid: isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid }));
+  }, [values.name, values.email, values.password, values.confirm_password]);
 
   const handleChange = (prop) => (event) => {
     const { value } = event.target;
     let error = '';
 
-    if (prop === 'username' && !validateUsername(value)) {
-      error = 'Username must be at least 5 characters';
-    } else if (prop === 'name' && !validateName(value)) {
+    if (prop === 'name' && !validateName(value)) {
       error = 'Name must be at least 5 characters';
     } else if (prop === 'email' && !validateEmail(value)) {
       error = 'Invalid email format';
@@ -101,7 +95,6 @@ const RegisterPage = () => {
     }
 
     setValues({ ...values, [prop]: value, errors: { ...values.errors, [prop]: error } });
-    updateFormValidity();
   };
 
   const handleClickShowPassword = () => {
@@ -111,8 +104,6 @@ const RegisterPage = () => {
   const handleMouseDownPassword = event => {
     event.preventDefault()
   };
-
-  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleCheckboxChange = (event) => {
     setChecked(event.target.checked);
@@ -126,7 +117,6 @@ const RegisterPage = () => {
     };
 
     const user = {
-      username: values.username,
       name: values.name,
       email: values.email,
       password: values.password,
@@ -226,22 +216,10 @@ const RegisterPage = () => {
             <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
               Adventure starts here 🚀
             </Typography>
-            <Typography variant='body2'>Make your app management easy and fun!</Typography>
+            <Typography variant='body2'>Make your coding experience Fun!</Typography>
           </Box>
 
           <form noValidate autoComplete='off' onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-            <TextField
-                autoFocus
-                fullWidth
-                id='username'
-                label='Username'
-                value={values.username}
-                onChange={handleChange('username')}
-                error={!!values.errors.username}
-                helperText={values.errors.username}
-                sx={{ marginBottom: 4 }}
-              />
-
             <TextField
               autoFocus
               fullWidth

@@ -21,7 +21,7 @@ urlpatterns = [
     path('token/verify/', CustomTokenVerifyView.as_view(), name='token_verify'),  # verify token view
     path('user/<int:id>/', UserViewSet.as_view({'get': 'retrieve'}), name='user_detail'),  # user detail view
     path('user/<int:id>/avatar/upload/', UserViewSet.as_view({'post': 'upload_avatar'}), name='upload_avatar'),
-    path('user/update-personal-info/', UserViewSet.as_view({'post': 'update_personal_info'}), name='update_user'),
+    path('user/<int:id>/update-personal-info/', UserViewSet.as_view({'post': 'update_personal_info'}), name='update_user'), # update user info view
     path('login/', LoginView.as_view(), name='login'),  # login view
     path('', home, name='home'),  # home view
 ]
