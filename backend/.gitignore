@@ -2,5 +2,6 @@
 /users/__pycache__/
 /users/migrations/__pycache__/
 /main/__pycache__/
+/users/migrations/
 
 .DS_STORE
